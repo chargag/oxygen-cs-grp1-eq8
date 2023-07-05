@@ -25,6 +25,7 @@ def test_env_vars():
     assert main.T_MAX == "78"
     assert main.T_MIN == "12"
 
+
 def load_test_vars(env_vars):
     for env_var in env_vars:
         os.environ[env_var["key"]] = env_var["value"]
