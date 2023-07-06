@@ -1,0 +1,29 @@
+name: Python Package using Conda
+
+on:
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install pipenv
+      run: |
+        sudo apt install -y pipenv
+    - name: install deps
+      run: |
+        pipenv install --dev
+    - name: Lint with flake8
+      run: |
+        flake8 
+    - name: Test with pytest
+      run: |
+        pytest
