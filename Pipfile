@@ -6,8 +6,11 @@ name = "pypi"
 [packages]
 requests = "*"
 signalrcore = "*"
+python-dotenv = "*"
 
 [dev-packages]
+pytest = "*"
+flake8 = "*"
 pre-commit = "*"
 
 [requires]
@@ -15,5 +18,5 @@ python_version = "3.8"
 
 [scripts]
 start = "python src/main.py"
-test = "# To implement"
-lint = "pre-commit run"
+test = "pytest"
+lint = "flake8"
