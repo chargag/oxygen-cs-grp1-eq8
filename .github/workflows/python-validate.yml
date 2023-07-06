@@ -22,10 +22,10 @@ jobs:
     - name: install pipenv
       run: |
         pip install pipenv
-    - name: install deps
-      run: |
-        pipenv install --dev
-        pipenv shell
+    - name: Install dependencies
+      uses: VaultVulp/action-pipenv@v2.0.1
+      with:
+        command: install -d
     - name: pre-commit checks
       run: |
         pre-commit run
