@@ -27,6 +27,11 @@ cd log680
 ```
 pipenv install
 ```
+or for development use :
+```
+pipenv install --dev
+pre-commit install
+```
 
 ## Setup
 
@@ -44,7 +49,23 @@ You need to setup the following variables inside the Main class:
 After setup, you can start the program with the following command:
 
 ```
-pipenv run strart
+pipenv run start
+```
+
+## Running the tests
+
+After setup, you can start the unit tests with the following command:
+
+```
+pipenv run test
+```
+
+## Running the linting
+
+After setup, you can start the unit tests with the following command:
+
+```
+pipenv run lint
 ```
 
 ## Logging

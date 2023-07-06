@@ -10,11 +10,14 @@ python-dotenv = "*"
 psycopg2 = "*"
 
 [dev-packages]
+pytest = "*"
+flake8 = "*"
+pre-commit = "*"
 
 [requires]
 python_version = "3.8"
 
 [scripts]
 start = "python src/main.py"
-test = "# To implement"
-lint = "# To implement"
+test = "pytest"
+lint = "flake8"
