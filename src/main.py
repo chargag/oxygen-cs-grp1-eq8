@@ -1,3 +1,4 @@
+import sys
 from signalrcore.hub_connection_builder import HubConnectionBuilder
 from dotenv import load_dotenv
 
@@ -6,6 +7,7 @@ import requests
 import json
 import time
 import os
+import psycopg2
 
 
 class Main:
@@ -15,10 +17,14 @@ class Main:
         self._hub_connection = None
         self.HOST = os.getenv('HOST')  # Setup your host here
         self.TOKEN = os.getenv('TOKEN')  # Setup your token here
-        self.TICKETS = os.getenv('TICKETS')  # Setup your tickets here
+        self.TICKS = os.getenv('TICKS')  # Setup your TICKS here
         self.T_MAX = os.getenv('T_MAX')  # Setup your max temperature here
         self.T_MIN = os.getenv('T_MIN')  # Setup your min temperature here
-        self.DATABASE = os.getenv('DATABASE')  # Setup your database here
+        self.DB_HOST = os.getenv('DB_HOST')  # Setup your database here
+        self.DB_NAME = os.getenv('DB_NAME')  # Setup your database here
+        self.DB_USER = os.getenv('DB_USER')  # Setup your database here
+        self.DB_PASSWORD = os.getenv('DB_PASSWORD')  # Setup your database here
+        self.DB_PORT = os.getenv('DB_PORT')  # Setup your database here
 
     def __del__(self):
         if self._hub_connection is not None:
@@ -60,33 +66,59 @@ class Main:
 
     def onSensorDataReceived(self, data):
         try:
-            print(data[0]["date"] + " --> " + data[0]["data"])
             date = data[0]["date"]
             dp = float(data[0]["data"])
-            self.send_temperature_to_fastapi(date, dp)
+            self._send_event_to_database(date, "DataReceived")
+            #  self.send_temperature_to_fastapi(date, dp)
             self.analyzeDatapoint(date, dp)
         except Exception as err:
             print(err)
 
     def analyzeDatapoint(self, date, data):
         if float(data) >= float(self.T_MAX):
-            self.sendActionToHvac(date, "TurnOnAc", self.TICKETS)
+            self.sendActionToHvac(date, "TurnOnAc", self.TICKS)
         elif float(data) <= float(self.T_MIN):
-            self.sendActionToHvac(date, "TurnOnHeater", self.TICKETS)
+            self.sendActionToHvac(date, "TurnOnHeater", self.TICKS)
 
     def sendActionToHvac(self, date, action, nbTick):
         r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{nbTick}")
         details = json.loads(r.text)
+        self._send_event_to_database(date, action)
         print(details)
 
-    def send_event_to_database(self, timestamp, event):
+    def _send_event_to_database(self, timestamp, event):
         try:
-            # To implement
-            pass
-        except requests.exceptions.RequestException as e:
-            # To implement
-            print(e)
-            pass
+            conn = psycopg2.connect(
+                f"host={self.DB_HOST}\
+                  port={self.DB_PORT}\
+                  dbname={self.DB_NAME}\
+                  user={self.DB_USER}\
+                  password={self.DB_PASSWORD}"
+            )
+            curr = conn.cursor()
+
+            curr.execute('SELECT count(*) FROM oxygencs.event_log;')
+            count_before = curr.fetchone()[0]
+
+            curr.execute(
+                'INSERT INTO oxygencs.event_log(created_at, event) VALUES (%s, %s);',
+                (timestamp, event)
+            )
+            conn.commit()
+
+            curr.execute('SELECT count(*) FROM oxygencs.event_log;')
+            count_after = curr.fetchone()[0]
+
+            if count_after == count_before:
+                raise psycopg2.DataError("Event was not inserted.")
+            else:
+                print(f"Event '{event}' was inserted.")
+
+        except (psycopg2.Error, psycopg2.DataError) as e:
+            print(f"An error occured while trying to save an event ({event}). {e}", file=sys.stderr)
+        finally:
+            curr.close()
+            conn.close()
 
 
 if __name__ == "__main__":
