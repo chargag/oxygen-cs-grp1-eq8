@@ -27,6 +27,11 @@ cd log680
 ```
 pipenv install
 ```
+or for development use :
+```
+pipenv install --dev
+pre-commit install
+```
 
 ## Setup
 
