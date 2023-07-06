@@ -1,0 +1,33 @@
+name: Python Package using Conda
+
+on:
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.8
+    - name: install pipenv
+      run: |
+        pip install pipenv
+    - name: install deps
+      run: |
+        pipenv install --dev
+    - name: pre-commit checks
+      run: |
+        pipenv run lint
+    - name: Test with pytest
+      run: |
+        pipenv run test
