@@ -21,6 +21,9 @@ jobs:
     - name: install deps
       run: |
         pipenv install --dev
+    - name: pre-commit checks
+      run: |
+        pre-commit run
     - name: Lint with flake8
       run: |
         flake8 
