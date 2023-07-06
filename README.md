@@ -52,6 +52,22 @@ After setup, you can start the program with the following command:
 pipenv run start
 ```
 
+## Running the tests
+
+After setup, you can start the unit tests with the following command:
+
+```
+pipenv run test
+```
+
+## Running the linting
+
+After setup, you can start the unit tests with the following command:
+
+```
+pipenv run lint
+```
+
 ## Logging
 
 The application logs important events such as connection open/close and error events to help in troubleshooting.

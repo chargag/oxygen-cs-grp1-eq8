@@ -1,22 +1,27 @@
 from signalrcore.hub_connection_builder import HubConnectionBuilder
+from dotenv import load_dotenv
+
 import logging
 import requests
 import json
 import time
+import os
 
 
 class Main:
-    def __init__(self):
+    def __init__(self, load_env_vars=load_dotenv):
+        load_env_vars()
+
         self._hub_connection = None
-        self.HOST = None  # Setup your host here
-        self.TOKEN = None  # Setup your token here
-        self.TICKETS = None  # Setup your tickets here
-        self.T_MAX = None  # Setup your max temperature here
-        self.T_MIN = None  # Setup your min temperature here
-        self.DATABASE = None  # Setup your database here
+        self.HOST = os.getenv('HOST')  # Setup your host here
+        self.TOKEN = os.getenv('TOKEN')  # Setup your token here
+        self.TICKETS = os.getenv('TICKETS')  # Setup your tickets here
+        self.T_MAX = os.getenv('T_MAX')  # Setup your max temperature here
+        self.T_MIN = os.getenv('T_MIN')  # Setup your min temperature here
+        self.DATABASE = os.getenv('DATABASE')  # Setup your database here
 
     def __del__(self):
-        if self._hub_connection != None:
+        if self._hub_connection is not None:
             self._hub_connection.stop()
 
     def setup(self):
@@ -49,7 +54,9 @@ class Main:
         self._hub_connection.on("ReceiveSensorData", self.onSensorDataReceived)
         self._hub_connection.on_open(lambda: print("||| Connection opened."))
         self._hub_connection.on_close(lambda: print("||| Connection closed."))
-        self._hub_connection.on_error(lambda data: print(f"||| An exception was thrown closed: {data.error}"))
+        self._hub_connection.on_error(lambda data: print(
+                f"||| An exception was thrown closed: {data.error}"
+            ))
 
     def onSensorDataReceived(self, data):
         try:
@@ -78,6 +85,7 @@ class Main:
             pass
         except requests.exceptions.RequestException as e:
             # To implement
+            print(e)
             pass
 
 
