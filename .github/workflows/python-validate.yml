@@ -25,6 +25,7 @@ jobs:
     - name: install deps
       run: |
         pipenv install --dev
+        pipenv shell
     - name: pre-commit checks
       run: |
         pre-commit run
