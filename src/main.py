@@ -26,6 +26,9 @@ class Main:
         self.DB_PASSWORD = os.getenv('DB_PASSWORD')  # Setup your database here
         self.DB_PORT = os.getenv('DB_PORT')  # Setup your database here
 
+        if self.TOKEN is None or self.TOKEN == '':
+            raise RuntimeError('No token was specified')
+
     def __del__(self):
         if self._hub_connection is not None:
             self._hub_connection.stop()
