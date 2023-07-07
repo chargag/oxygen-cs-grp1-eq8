@@ -1,0 +1,28 @@
+
+version: '3.8'
+
+services:
+  metrics_app:
+    image:  oxygencseq8/oxygen-cs:latest
+    environment:
+      - DB_HOST='db'
+      - DB_PORT='5432'
+      - DB_USER='log680'
+      - DB_NAME='log680'
+      - DB_PASSWORD='password'
+    depends_on:
+      - db
+  db:
+    image: postgres:15-alpine3.18
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./src/migrations/2023-07-06/add_event_table.sql:/docker-entrypoint-initdb.d/add_event_table.sql
+    environment:
+      - POSTGRES_USER=log680
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=log680
+
+volumes:
+  postgres_data:
