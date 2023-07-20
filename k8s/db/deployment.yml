@@ -35,7 +35,5 @@ spec:
               name: db-user
               key: username
         - name: POSTGRES_DB
-          value: log680
-        volume:
-          
+          value: log680          
         
