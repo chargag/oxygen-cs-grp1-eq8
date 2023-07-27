@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: log680-eq8-postgres-deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: log680-postgres
+        image: postgres:15-alpine3.18
+        ports:
+        - containerPort: 5432
+        resources:
+          limits:
+            cpu: '160m' # 500m limit divided by 3 (postgres, metrics and oxygencs)
+            memory: '160Mi' # 500m limit divided by 3 (postgres, metrics and oxygencs)
+        env:
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-password
+              key: password
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-user
+              key: username
+        - name: POSTGRES_DB
+          value: log680          
+        
