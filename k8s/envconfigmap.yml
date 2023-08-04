@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-conf-map
+data:
+  database_host: "postgres-service.grp1-team8-namespace.svc.cluster.local"
+  database_port: "5432"

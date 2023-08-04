@@ -27,3 +27,13 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: oxygencseq8/oxygen-cs:${{ github.run_id }}, oxygencseq8/oxygen-cs:latest
+
+      - name: Create KubeConfig file
+        run: |
+          mkdir ${HOME}/.kube
+          echo ${{ secrets.KUBE_CONFIG }} | base64 --decode > ${HOME}/.kube/config
+          cat ${HOME}/.kube/config
+      - name: Use Context
+        run: kubectl config use-context gke_aesthetic-codex-388516_us-central1-c_log680-k8s
+      - name: Deploy to k8s
+        run: kubectl apply -f k8s/deployment.yml

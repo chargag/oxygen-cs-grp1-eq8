@@ -71,7 +71,7 @@ class Main:
         try:
             date = data[0]["date"]
             dp = float(data[0]["data"])
-            self._send_event_to_database(date, "DataReceived")
+            self._send_event_to_database(date, "DataReceived", dp)
             #  self.send_temperature_to_fastapi(date, dp)
             self.analyzeDatapoint(date, dp)
         except Exception as err:
@@ -86,10 +86,10 @@ class Main:
     def sendActionToHvac(self, date, action, nbTick):
         r = requests.get(f"{self.HOST}/api/hvac/{self.TOKEN}/{action}/{nbTick}")
         details = json.loads(r.text)
-        self._send_event_to_database(date, action)
+        self._send_event_to_database(date, action, None)
         print(details)
 
-    def _send_event_to_database(self, timestamp, event):
+    def _send_event_to_database(self, timestamp, event, temp):
         try:
             conn = psycopg2.connect(
                 f"host={self.DB_HOST}\
@@ -104,8 +104,8 @@ class Main:
             count_before = curr.fetchone()[0]
 
             curr.execute(
-                'INSERT INTO oxygencs.event_log(created_at, event) VALUES (%s, %s);',
-                (timestamp, event)
+                'INSERT INTO oxygencs.event_log(created_at, event, temperature) VALUES (%s, %s, %s);',
+                (timestamp, event, temp)
             )
             conn.commit()
 
